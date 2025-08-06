@@ -77,7 +77,32 @@ blockchain = Blockchain()
 
 @app.route('/minerar', methods=['GET'])
 def minerar():
-    return 'Mineração iniciada!'
+    # Executa a prova de trabalho para o último bloco
+    ultimo_bloco = blockchain.ultimo_bloco
+    ultima_prova = ultimo_bloco['prova']
+    prova = blockchain.prova_de_trabalho(ultima_prova)
+
+    # Adiciona uma transação de recompensa para o minerador
+    # O remetente é "0" para indicar que é uma recompensa
+
+    blockchain.nova_transacao(
+        remetente="0",
+        destinatario=node_id,
+        valor=1,
+    )
+
+    # Cria o novo bloco e adiciona à chain
+    hash_anterior = blockchain.hash(ultimo_bloco)
+    bloco = blockchain.novo_bloco(prova, hash_anterior)
+
+    response = {
+        'message': 'Bloco minerado com sucesso',
+        'index': bloco['index'],
+        'prova': prova,
+        'hash_anterior': bloco['hash_anterior'],
+    }
+
+    return jsonify(response), 200
 
 @app.route('/transacao/nova', methods=['POST'])
 def nova_transacao():
