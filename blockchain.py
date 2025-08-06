@@ -3,6 +3,8 @@ import json
 from time import time
 from uuid import uuid4
 
+from flask import Flask, jsonify
+
 class Blockchain(object):
     def __init__(self):
         self.chain = []
@@ -65,3 +67,29 @@ class Blockchain(object):
     def ultimo_bloco(self):
         # Retorna o último bloco da cadeia
         pass
+
+
+app = Flask(__name__)
+
+node_id = str(uuid4()).replace('-', '')
+
+blockchain = Blockchain()
+
+@app.route('/minerar', methods=['GET'])
+def minerar():
+    return 'Mineração iniciada!'
+
+@app.route('/transacao/nova', methods=['POST'])
+def nova_transacao():
+    return "Transação adicionada com sucesso!"
+
+@app.route('/chain', methods=['GET'])
+def obter_cadeia():
+    response = {
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain),
+    }
+    return jsonify(response), 200
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0',port=5000)
